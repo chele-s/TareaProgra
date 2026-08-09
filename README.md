@@ -15,15 +15,17 @@ En esta primera fase se establece la infraestructura básica de datos, lectura e
 
 ---
 
-## 2. Arquitectura de Módulos y Distribución de Responsabilidades
+## 2. Arquitectura de Módulos y Distribución de Trabajo
 
-| Módulo | Integrante | Responsabilidad Técnica | Estado |
-| :--- | :--- | :--- | :---: |
-| **Módulo 1** | Integrante 1 | Infraestructura de datos (`struct Producto`), lectura de `inventario.txt` hasta fin de archivo (`EOF`), manejo de errores de apertura y visualización tabular en consola. | **Completado** |
-| **Módulo 2** | Integrante 2 | Menú principal interactivo, control de flujo continuo mediante ciclo `do-while` y estrucctura de selección `switch-case`. | **Completado** |
-| **Módulo 3** | Integrante 3 | Validación de datos de entrada (`int.TryParse`), prevención de bucles infinitos por búfer no numérico y funciones auxiliares de validación. | **Completado** |
-| **Módulo 4** | Integrante 4 | Declaración de prototipos y definición de funciones "dummy" (`AgregarProducto`, `VenderProducto`) para preparación de submódulos. | **Completado** |
-| **Módulo 5** | Integrante 5 | Integración general del código fuente, verificación de compilación sin advertencias y documentación institucional de entrega. | **Completado** |
+El proyecto está diseñado bajo una arquitectura modular en un solo compilable. Cada integrante del equipo tiene a su cargo funciones específicas dentro de `Program.cs`:
+
+| Módulo | Ámbito Técnico | Funciones Asignadas | Integrante Responsable |
+| :--- | :--- | :--- | :--- |
+| **Módulo 1** | Infraestructura de Datos y Archivos | Definición de `struct Producto`, lectura de `inventario.txt` (`EOF`) y función `MostrarInventario()`. | Integrante 1 |
+| **Módulo 2** | Menú e Interfaz de Navegación | Control de flujo principal (`do-while`), visualización del menú en `MostrarMenu()` y flujo `switch-case`. | Integrante 2 |
+| **Módulo 3** | Validaciones y Control de Búfer | Prevención de excepciones por texto inválido en `LeerOpcionValida()`, `ValidarPrecio()` y `ValidarCantidad()`. | Integrante 3 |
+| **Módulo 4** | Operaciones de Inventario | Prototipos y desarrollo de lógica funcional para `AgregarProducto()` y `VenderProducto()`. | Integrante 4 |
+| **Módulo 5** | Integración y Documentación | Revisión de compilación limpia, estándares de código y preparación del documento institucional de entrega. | Integrante 5 |
 
 ---
 
