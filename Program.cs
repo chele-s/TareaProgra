@@ -34,12 +34,12 @@ namespace TiendaMascotas
                         break;
                     case 4:
                         salir = true;
-                        Console.WriteLine("\nSaliendo del sistema... ¡Hasta luego!\n");
+                        Console.WriteLine("\nSaliendo del sistema... \n");
                         break;
                 }
             } while (!salir);
         }
-
+        //Gabriel
         static void MostrarMenu()
         {
             Console.WriteLine("==============================================");
