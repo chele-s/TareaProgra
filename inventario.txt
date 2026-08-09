@@ -1,0 +1,10 @@
+101,Concentrado Perro 10kg,24.99,15
+102,Collar Antipulgas Gato,8.50,30
+103,Champu para Mascotas 500ml,6.75,20
+104,Arena para Gatos 5kg,11.20,25
+105,Juguete Hueso de Goma,4.99,40
+106,Cama Ortopedica Mediana,35.00,10
+107,Plato Acero Inoxidable,5.50,50
+108,Bebedero Automatico 2L,18.90,12
+109,Correa Retractil 5m,12.99,18
+110,Rascador Gatos 3 Niveles,45.00,8
