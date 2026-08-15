@@ -52,7 +52,7 @@ namespace TiendaMascotas
             Console.WriteLine("==============================================");
             Console.Write("Seleccione una opcion (1-4): ");
         }
-
+        // Cruz
         static int LeerOpcionValida()
         {
             int opcion;
