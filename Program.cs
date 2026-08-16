@@ -17,6 +17,7 @@ namespace TiendaMascotas
         static void Main(string[] args)
         {
             bool salir = false;
+            // Ibrahim 
             do
             {
                 MostrarMenu();
@@ -52,7 +53,7 @@ namespace TiendaMascotas
             Console.WriteLine("==============================================");
             Console.Write("Seleccione una opcion (1-4): ");
         }
-        // Cruz
+        //Cruz 
         static int LeerOpcionValida()
         {
             int opcion;
