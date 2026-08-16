@@ -1,3 +1,4 @@
+// Owen (union de partes)
 using System;
 using System.IO;
 using System.Globalization;
@@ -17,7 +18,7 @@ namespace TiendaMascotas
         static void Main(string[] args)
         {
             bool salir = false;
-            // Ibrahim 
+            // Ibrahim (do-while y iteraciones)
             do
             {
                 MostrarMenu();
@@ -40,7 +41,7 @@ namespace TiendaMascotas
                 }
             } while (!salir);
         }
-        //Gabriel
+        //Gabriel (menu principal)
         static void MostrarMenu()
         {
             Console.WriteLine("==============================================");
@@ -53,7 +54,7 @@ namespace TiendaMascotas
             Console.WriteLine("==============================================");
             Console.Write("Seleccione una opcion (1-4): ");
         }
-        //Cruz 
+        //Pablo (Validaciones)
         static int LeerOpcionValida()
         {
             int opcion;
@@ -91,7 +92,7 @@ namespace TiendaMascotas
             }
             return cantidad;
         }
-
+        // Cruz (Dummies y prototipos)
         static void AgregarProducto()
         {
             Console.WriteLine("\nMódulo a cargo de [Nombre del Estudiante - Integrante 4]\n");
