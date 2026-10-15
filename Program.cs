@@ -58,6 +58,7 @@ namespace TiendaMascotas
                         break;
                     case 6:
                         salir = true;
+                        GuardarInventario(inventario, total);
                         Console.WriteLine("\nSaliendo del sistema... \n");
                         break;
                 }
@@ -159,10 +160,82 @@ namespace TiendaMascotas
             return entrada;
         }
 
-        // Integrante 2: Alta de nuevos productos
+        // Integrante 2 (Ibrahim): Alta de productos con validacion de capacidad e ID unico
         static void AgregarProducto(Producto[] inventario, ref int total)
         {
-            Console.WriteLine("\nModulo a cargo de Integrante 2 (Altas)\n");
+            if (total >= inventario.Length)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\n[ERROR] Se ha alcanzado la capacidad máxima del inventario (100 productos).\n");
+                Console.ResetColor();
+                return;
+            }
+
+            Console.WriteLine("\n==============================================");
+            Console.WriteLine("             AGREGAR NUEVO PRODUCTO           ");
+            Console.WriteLine("==============================================");
+
+            int id;
+            while (true)
+            {
+                Console.Write("Ingrese el ID del producto (número entero positivo): ");
+                if (!int.TryParse(Console.ReadLine(), out id) || id <= 0)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Error: El ID debe ser un número entero mayor a 0.");
+                    Console.ResetColor();
+                    continue;
+                }
+
+                if (BuscarProductoPorId(inventario, total, id) != -1)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"Error: Ya existe un producto con el ID {id}. Ingrese un ID diferente.");
+                    Console.ResetColor();
+                    continue;
+                }
+
+                break;
+            }
+
+            string nombre = ValidarTextoNoVacio("Ingrese el nombre del producto: ").Replace(",", " ");
+            float precio = ValidarPrecio();
+            int cantidad = ValidarCantidad();
+
+            string confirmacion = ValidarSiNo("¿Desea registrar este producto en el inventario? (S/N): ");
+            if (confirmacion == "N")
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("\n[REGISTRO CANCELADO] No se realizaron cambios en el inventario.\n");
+                Console.ResetColor();
+                return;
+            }
+
+            inventario[total].Id = id;
+            inventario[total].Nombre = nombre;
+            inventario[total].Precio = precio;
+            inventario[total].Cantidad = cantidad;
+            total++;
+
+            // Persistencia: agregar linea (append)
+            try
+            {
+                using (StreamWriter sw = new StreamWriter(RutaArchivo, true))
+                {
+                    sw.WriteLine($"{id},{nombre},{precio.ToString("0.00", CultureInfo.InvariantCulture)},{cantidad}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"\n[ERROR AL GUARDAR ARCHIVO] No se pudo persistir el producto: {ex.Message}\n");
+                Console.ResetColor();
+            }
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("\n[EXITO] Producto agregado correctamente.");
+            Console.WriteLine($"ID: {id} | Producto: {nombre} | Precio: ${precio.ToString("0.00", CultureInfo.InvariantCulture)} | Stock: {cantidad}\n");
+            Console.ResetColor();
         }
 
         // Integrante 1 (Gabriel): Carga de datos desde inventario.txt
@@ -243,7 +316,7 @@ namespace TiendaMascotas
             }
         }
 
-        // Integrante 3: Busqueda secuencial por ID
+        // Integrante 3 (Owen): Busqueda secuencial por ID
         static int BuscarProductoPorId(Producto[] inventario, int total, int id)
         {
             for (int i = 0; i < total; i++)
@@ -361,7 +434,7 @@ namespace TiendaMascotas
             Console.ResetColor();
         }
 
-        // Integrante 2: Consulta del inventario en formato tabular
+        // Integrante 2 (Ibrahim): Consulta del inventario en formato tabular y total monetario
         static void MostrarInventario(Producto[] inventario, int total)
         {
             Console.WriteLine("\n==========================================================================");
@@ -392,16 +465,162 @@ namespace TiendaMascotas
             Console.WriteLine("==========================================================================\n");
         }
 
-        // Integrante 3: Modificacion de productos por ID
+        // Integrante 3 (Owen): Modificacion de productos por ID y actualizacion en disco
         static void ModificarProducto(Producto[] inventario, int total)
         {
-            Console.WriteLine("\n[Modulo a cargo de Integrante 3 - Modificar Producto]\n");
+            if (total == 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("\n[AVISO] No hay productos registrados en el inventario para modificar.\n");
+                Console.ResetColor();
+                return;
+            }
+
+            Console.WriteLine("\n==============================================");
+            Console.WriteLine("              MODIFICAR PRODUCTO              ");
+            Console.WriteLine("==============================================");
+
+            int idBuscado;
+            Console.Write("Ingrese el ID del producto que desea modificar: ");
+            while (!int.TryParse(Console.ReadLine(), out idBuscado) || idBuscado <= 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write("ID invalido. Ingrese un numero entero mayor a 0: ");
+                Console.ResetColor();
+            }
+
+            int indice = BuscarProductoPorId(inventario, total, idBuscado);
+            if (indice == -1)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"\n[ERROR] Producto con ID {idBuscado} no encontrado.\n");
+                Console.ResetColor();
+                return;
+            }
+
+            Console.WriteLine("\n---------------- DATOS ACTUALES ----------------");
+            Console.WriteLine($"ID:       {inventario[indice].Id}");
+            Console.WriteLine($"Nombre:   {inventario[indice].Nombre}");
+            Console.WriteLine($"Precio:   ${inventario[indice].Precio.ToString("0.00", CultureInfo.InvariantCulture)}");
+            Console.WriteLine($"Cantidad: {inventario[indice].Cantidad}");
+            Console.WriteLine("------------------------------------------------");
+
+            Console.WriteLine("Seleccione el campo a modificar:");
+            Console.WriteLine("1. Modificar Nombre");
+            Console.WriteLine("2. Modificar Precio");
+            Console.WriteLine("3. Modificar Cantidad en Stock");
+            Console.WriteLine("4. Modificar Todo");
+            Console.WriteLine("5. Cancelar");
+            Console.Write("Opcion (1-5): ");
+
+            int opcionMod;
+            while (!int.TryParse(Console.ReadLine(), out opcionMod) || opcionMod < 1 || opcionMod > 5)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write("Opcion invalida. Ingrese un numero entre 1 y 5: ");
+                Console.ResetColor();
+            }
+
+            if (opcionMod == 5)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("\n[CANCELADO] No se realizaron modificaciones.\n");
+                Console.ResetColor();
+                return;
+            }
+
+            switch (opcionMod)
+            {
+                case 1:
+                    inventario[indice].Nombre = ValidarTextoNoVacio("Ingrese el nuevo nombre: ").Replace(",", " ");
+                    break;
+                case 2:
+                    inventario[indice].Precio = ValidarPrecio();
+                    break;
+                case 3:
+                    inventario[indice].Cantidad = ValidarCantidad();
+                    break;
+                case 4:
+                    inventario[indice].Nombre = ValidarTextoNoVacio("Ingrese el nuevo nombre: ").Replace(",", " ");
+                    inventario[indice].Precio = ValidarPrecio();
+                    inventario[indice].Cantidad = ValidarCantidad();
+                    break;
+            }
+
+            GuardarInventario(inventario, total);
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("\n[EXITO] Producto modificado y guardado en archivo correctamente.");
+            Console.WriteLine($"ID: {inventario[indice].Id} | Nombre: {inventario[indice].Nombre} | Precio: ${inventario[indice].Precio.ToString("0.00", CultureInfo.InvariantCulture)} | Stock: {inventario[indice].Cantidad}\n");
+            Console.ResetColor();
         }
 
-        // Integrante 3: Eliminacion de productos y desplazamiento en arreglo
+        // Integrante 3 (Owen): Eliminacion con confirmacion y algoritmo de desplazamiento
         static void EliminarProducto(Producto[] inventario, ref int total)
         {
-            Console.WriteLine("\n[Modulo a cargo de Integrante 3 - Eliminar Producto]\n");
+            if (total == 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("\n[AVISO] No hay productos registrados en el inventario para eliminar.\n");
+                Console.ResetColor();
+                return;
+            }
+
+            Console.WriteLine("\n==============================================");
+            Console.WriteLine("              ELIMINAR PRODUCTO               ");
+            Console.WriteLine("==============================================");
+
+            int idBuscado;
+            Console.Write("Ingrese el ID del producto que desea eliminar: ");
+            while (!int.TryParse(Console.ReadLine(), out idBuscado) || idBuscado <= 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write("ID invalido. Ingrese un numero entero mayor a 0: ");
+                Console.ResetColor();
+            }
+
+            int indice = BuscarProductoPorId(inventario, total, idBuscado);
+            if (indice == -1)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"\n[ERROR] Producto con ID {idBuscado} no encontrado.\n");
+                Console.ResetColor();
+                return;
+            }
+
+            Console.WriteLine("\n---------------- PRODUCTO ENCONTRADO ----------------");
+            Console.WriteLine($"ID:       {inventario[indice].Id}");
+            Console.WriteLine($"Nombre:   {inventario[indice].Nombre}");
+            Console.WriteLine($"Precio:   ${inventario[indice].Precio.ToString("0.00", CultureInfo.InvariantCulture)}");
+            Console.WriteLine($"Cantidad: {inventario[indice].Cantidad}");
+            Console.WriteLine("-----------------------------------------------------");
+
+            string confirmacion = ValidarSiNo($"¿Está seguro de eliminar '{inventario[indice].Nombre}' del inventario? (S/N): ");
+            if (confirmacion == "N")
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("\n[CANCELADO] Eliminacion cancelada. No se realizaron cambios.\n");
+                Console.ResetColor();
+                return;
+            }
+
+            string nombreEliminado = inventario[indice].Nombre;
+            int idEliminado = inventario[indice].Id;
+
+            // Algoritmo de desplazamiento hacia la izquierda
+            for (int i = indice; i < total - 1; i++)
+            {
+                inventario[i] = inventario[i + 1];
+            }
+            inventario[total - 1] = default(Producto);
+            total--;
+
+            GuardarInventario(inventario, total);
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"\n[EXITO] El producto '{nombreEliminado}' (ID: {idEliminado}) fue eliminado correctamente.");
+            Console.WriteLine($"Productos restantes en inventario: {total}\n");
+            Console.ResetColor();
         }
     }
 }
