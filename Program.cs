@@ -1,13 +1,18 @@
-//Agreguen sus nombres de nuevo a lo que agreguen y modifiquen de sus partes para tener todo organizado
+// Proyecto: Sistema de Gestion de Inventario y Ventas
+// Distribucion de trabajo:
+// - Integrante 1 (Gabriel): Persistencia (Cargar/Guardar) y Modulo de Ventas
+// - Integrante 2 (Ibrahim): Mostrar Inventario y Agregar Producto
+// - Integrante 3 (Owen): Modificar Producto, Eliminar Producto y Busqueda por ID
+// - Integrante 4 (Pablo): Menu principal y Validaciones transversales
+// - Integrante 5 (Gabriel): Casos limite y pruebas de robustez
 
-
-// Owen (union de partes)
 using System;
 using System.IO;
 using System.Globalization;
 
 namespace TiendaMascotas
 {
+    // Integrante 1 (Gabriel)
     public struct Producto
     {
         public int Id;
@@ -20,6 +25,7 @@ namespace TiendaMascotas
     {
         const string RutaArchivo = "inventario.txt";
 
+        // Integrante 4 (Pablo) e Ibrahim: Flujo principal y navegacion del menu
         static void Main(string[] args)
         {
             Producto[] inventario = new Producto[100];
@@ -28,57 +34,72 @@ namespace TiendaMascotas
             CargarInventario(inventario, ref total);
 
             bool salir = false;
-            // Ibrahim (do-while y iteraciones)
             do
             {
+                try { Console.Clear(); } catch { }
                 MostrarMenu();
                 int opcion = LeerOpcionValida();
                 switch (opcion)
                 {
                     case 1:
-                        AgregarProducto(inventario, ref total);
-                        break;
-                    case 2:
-                        VenderProducto(inventario, total);
-                        break;
-                    case 3:
                         MostrarInventario(inventario, total);
                         break;
+                    case 2:
+                        AgregarProducto(inventario, ref total);
+                        break;
+                    case 3:
+                        ModificarProducto(inventario, total);
+                        break;
                     case 4:
+                        EliminarProducto(inventario, ref total);
+                        break;
+                    case 5:
+                        VenderProducto(inventario, total);
+                        break;
+                    case 6:
                         salir = true;
                         Console.WriteLine("\nSaliendo del sistema... \n");
                         break;
                 }
+
+                if (!salir)
+                {
+                    Console.WriteLine("\nPresione cualquier tecla para regresar al menú principal...");
+                    try { Console.ReadKey(); } catch { Console.ReadLine(); }
+                }
             } while (!salir);
         }
 
-        // Original Gabriel, a cargo del que elija la parte 4 (Menu Principal) remodelar y mejorar esta parte porfasss
+        // Integrante 4 (Pablo): Despliegue del menu de opciones
         static void MostrarMenu()
         {
             Console.WriteLine("==============================================");
             Console.WriteLine("    TIENDA DE MASCOTAS - SISTEMA DE GESTION   ");
             Console.WriteLine("==============================================");
-            Console.WriteLine("1. Agregar Producto");
-            Console.WriteLine("2. Vender Producto");
-            Console.WriteLine("3. Mostrar Inventario");
-            Console.WriteLine("4. Salir");
+            Console.WriteLine("1. Mostrar Inventario");
+            Console.WriteLine("2. Agregar Producto");
+            Console.WriteLine("3. Modificar Producto");
+            Console.WriteLine("4. Eliminar Producto");
+            Console.WriteLine("5. Vender Producto");
+            Console.WriteLine("6. Salir");
             Console.WriteLine("==============================================");
-            Console.Write("Seleccione una opcion (1-4): ");
+            Console.Write("Seleccione una opcion (1-6): ");
         }
 
-        // Original de pablo, a cargo del que elija la parte 4 (Validaciones Transversales)
+        // Integrante 4 (Pablo): Validacion de entrada numerica (1-6)
         static int LeerOpcionValida()
         {
             int opcion;
-            while (!int.TryParse(Console.ReadLine(), out opcion) || opcion < 1 || opcion > 4)
+            while (!int.TryParse(Console.ReadLine(), out opcion) || opcion < 1 || opcion > 6)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write("Opcion invalida. Ingrese un numero entero entre 1 y 4: ");
+                Console.Write("Opcion invalida. Ingrese un numero entero entre 1 y 6: ");
                 Console.ResetColor();
             }
             return opcion;
         }
 
+        // Integrante 4 (Pablo): Validacion de precio no negativo
         static float ValidarPrecio()
         {
             float precio;
@@ -92,6 +113,7 @@ namespace TiendaMascotas
             return precio;
         }
 
+        // Integrante 4 (Pablo): Validacion de cantidad no negativa
         static int ValidarCantidad()
         {
             int cantidad;
@@ -105,13 +127,45 @@ namespace TiendaMascotas
             return cantidad;
         }
 
-        // Original de cruz, remodelacion acargo del que elija la parte 2 (CRUD - Altas)
+        // Integrante 4 (Pablo): Validacion para campos de texto no vacios
+        public static string ValidarTextoNoVacio(string mensaje)
+        {
+            Console.Write(mensaje);
+            string? entrada = Console.ReadLine();
+
+            while (string.IsNullOrWhiteSpace(entrada))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write("Error: El campo no puede estar vacio. Intente de nuevo: ");
+                Console.ResetColor();
+                entrada = Console.ReadLine();
+            }
+            return entrada.Trim();
+        }
+
+        // Integrante 4 (Pablo): Validacion para confirmaciones (S/N)
+        public static string ValidarSiNo(string mensaje)
+        {
+            Console.Write(mensaje);
+            string? entrada = Console.ReadLine()?.Trim().ToUpper();
+
+            while (entrada != "S" && entrada != "N")
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write("Error: Respuesta invalida. Ingrese unicamente 'S' (Si) o 'N' (No): ");
+                Console.ResetColor();
+                entrada = Console.ReadLine()?.Trim().ToUpper();
+            }
+            return entrada;
+        }
+
+        // Integrante 2: Alta de nuevos productos
         static void AgregarProducto(Producto[] inventario, ref int total)
         {
             Console.WriteLine("\nModulo a cargo de Integrante 2 (Altas)\n");
         }
 
-        // Gabriel (Persistencia - Cargar y Guardar Inventario)
+        // Integrante 1 (Gabriel): Carga de datos desde inventario.txt
         static void CargarInventario(Producto[] inventario, ref int total)
         {
             total = 0;
@@ -168,6 +222,7 @@ namespace TiendaMascotas
             }
         }
 
+        // Integrante 1 (Gabriel): Guardado de inventario en archivo
         static void GuardarInventario(Producto[] inventario, int total)
         {
             try
@@ -188,7 +243,7 @@ namespace TiendaMascotas
             }
         }
 
-        // Parte 3 (CRUD - Busqueda por ID)
+        // Integrante 3: Busqueda secuencial por ID
         static int BuscarProductoPorId(Producto[] inventario, int total, int id)
         {
             for (int i = 0; i < total; i++)
@@ -201,7 +256,7 @@ namespace TiendaMascotas
             return -1;
         }
 
-        // Gabriel (Modulo de Ventas Transaccional)
+        // Integrante 1 (Gabriel): Proceso de venta y emision de comprobante
         static void VenderProducto(Producto[] inventario, int total)
         {
             if (total == 0)
@@ -275,15 +330,7 @@ namespace TiendaMascotas
             Console.WriteLine($"Total a pagar: ${totalPagar.ToString("0.00", CultureInfo.InvariantCulture)}");
             Console.WriteLine("---------------------------------------------------");
 
-            Console.Write("¿Desea confirmar la venta? (S/N): ");
-            string? respuesta = Console.ReadLine()?.Trim().ToUpper();
-            while (respuesta != "S" && respuesta != "N")
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write("Opcion invalida. Ingrese 'S' para confirmar o 'N' para cancelar: ");
-                Console.ResetColor();
-                respuesta = Console.ReadLine()?.Trim().ToUpper();
-            }
+            string respuesta = ValidarSiNo("¿Desea confirmar la venta? (S/N): ");
 
             if (respuesta == "N")
             {
@@ -314,7 +361,7 @@ namespace TiendaMascotas
             Console.ResetColor();
         }
 
-        // Original de cruz, acargo del que elija la parte 2 (CRUD - Consulta de Inventario)
+        // Integrante 2: Consulta del inventario en formato tabular
         static void MostrarInventario(Producto[] inventario, int total)
         {
             Console.WriteLine("\n==========================================================================");
@@ -343,6 +390,18 @@ namespace TiendaMascotas
                 Console.WriteLine($"Valor total del inventario: ${valorTotalInventario.ToString("0.00", CultureInfo.InvariantCulture)}");
             }
             Console.WriteLine("==========================================================================\n");
+        }
+
+        // Integrante 3: Modificacion de productos por ID
+        static void ModificarProducto(Producto[] inventario, int total)
+        {
+            Console.WriteLine("\n[Modulo a cargo de Integrante 3 - Modificar Producto]\n");
+        }
+
+        // Integrante 3: Eliminacion de productos y desplazamiento en arreglo
+        static void EliminarProducto(Producto[] inventario, ref int total)
+        {
+            Console.WriteLine("\n[Modulo a cargo de Integrante 3 - Eliminar Producto]\n");
         }
     }
 }
